@@ -1,5 +1,5 @@
 import React from 'react'
-import axios from 'axios'
+import '../styles/Global.css'
 
 import {
     Form,
@@ -10,69 +10,132 @@ import {
     Button
 } from 'react-bootstrap';
 
+// import {
+//     Image,
+//     Video,
+//     Transformation,
+//     CloudinaryContext
+// } from 'cloudinary-react'
+
+const cloudName = 'dkhupnzr8'
+const preset = 's24frout'
+const URL = `https://api.cloudinary.com/v1_1/${cloudName}/image/upload`
 
 class CreateAnnonce extends React.Component {
     state = {
-        villename: "",
-        villename2: "",
+        location: { cordinates: [], address: "" },
+        location1: { cordinates: [], address: "" },
         period: "",
-        titre: ""
+        titre: "",
+        // auteur: this.props.auteur,
+        file: null
+    }
+
+    updateLocation = loc => e => {
+
+        this.setState({[loc]: {...this.state.location,[e.target.name]: e.target.value }})
     }
 
     updateInput = e => {
+        console.log("e target name : ", e.target.name);
+        console.log("e target value : ", e.target.value);
+        console.log(this.state[e.target.name])
         this.setState({[e.target.name] : e.target.value})
+
     }
 
     handleCreateAnnonce = e => {
         e.preventDefault()
 
-        const { villename, villename2, period, titre } = this.state
+        const { location, location1, period, titre } = this.state
+        console.log("auteur test : ", this.props.auteur);
+        
+        fetch('/create/createAnnonce', {
+            method: 'POST',
+            headers: {
+                "Content-type": "application/json"
+            },
+            body: JSON.stringify({ location, location1, period, titre, auteur: this.props.auteur })
+            
+        })
+        //here res is just the reponse we got and we like to get the response in json format
+        .then(res => res.json())
+        .then(res => {
+            console.log("res log",res)
+            this.props.setAnnonce({annonce: res})
+            this.props.history.push('/')
+        })
+        .catch(err => {
+            console.log(err);
+        })
 
-        axios.post('/auth/createAnnonce', { villename, villename2, period, titre })
-            .then(res => {
-                console.log(res);
-                
+        this.state.file
+            ? this.fileUpload(this.state.file).then(publicId => {
+                console.log('publicId : ', publicId)
+                publicId && this.setState({ publicId, error: null })
             })
+            : this.setState({ error: 'Vous n\'avez  pas selectionné le fichier' })
+    }
 
+    onChange = file => this.setState({ file })
+
+    handleErrors = response => {
+        if(!response.ok) {
+            this.setState({ url: null, error: response.statusText })
+        }
+        return response
+    }
+
+    fileUpload(file) {
+        const formData = new FormData()
+        formData.append('file', file)
+        formData.append('upload_preset', preset)
+
+        return(
+            fetch(URL, { method: 'POST', body: formData })
+            .then(this.handleErrors)
+            .then(r => r.json())
+            .then(data => data.public_id)
+        )
     }
 
     render() {
         return (
-            <div>
+            <div className="container">
                 <Form horizontal>
-                    <FormGroup controlId="formHorizontalFirstname" >
+                    <FormGroup controlId="formHorizontalLocation" >
                         <Col componentClass={ControlLabel} sm={4} >
                             Lieux de la chambre
                         </Col>
                         <Col sm={4}>
                         <FormControl
-                            name="firstname"
+                            name="address"
                             type="text"
                             placeholder="Lieux de la chambre"
                             onChange={
-                            this.updateInput
+                                this.updateLocation('location')
                             }
                             value={
-                            this.state.firstname
+                                this.state.location.address
                             } 
                             />
                         </Col>
                     </FormGroup>
 
-                    <FormGroup controlId="formHorizontalLastname">
+                    <FormGroup controlId="formHorizontalLocation1">
                         <Col componentClass={ControlLabel} sm={4}>
-                        Last name
+                            Lieux de la chambre recherchée
                         </Col>
                         <Col sm={4}>
                         <FormControl 
-                            name="lastname"
+                            name="address"
                             type="text"
-                            placeholder = "Lastname"
+                            placeholder= "Lieux de la chambre recherchée"
                             onChange={
-                            this.updateInput
+                            this.updateLocation('location1')
                             }
                             value={
-                            this.state.lastname
+                                this.state.location1.address
                             } 
                             />
                         </Col>
@@ -80,18 +143,18 @@ class CreateAnnonce extends React.Component {
 
                     <FormGroup controlId="formHorizontalEmail" >
                         <Col componentClass={ControlLabel} sm={4} >
-                        Email
+                            Période de disponiblité
                         </Col>
                         <Col sm={4}>
                         <FormControl 
-                            name="email"
-                            type="email"
-                            placeholder="Email"
+                            name="period"
+                            type="text"
+                            placeholder="Période de disponiblité"
                             onChange={
                             this.updateInput
                             }
                             value={
-                            this.state.email
+                            this.state.period
                             } 
                             />
                         </Col>
@@ -99,38 +162,38 @@ class CreateAnnonce extends React.Component {
 
                     <FormGroup controlId="formHorizontalPassword">
                         <Col componentClass={ControlLabel} sm={4}>
-                        Password
+                        Titre d'annonce
                         </Col>
                         <Col sm={4}>
                         <FormControl 
-                            name="password"
-                            type="password"
-                            placeholder="Password"
+                            name="titre"
+                            type="text"
+                            placeholder="Titre d'annonce"
                             onChange={
                             this.updateInput
                             }
                             value={
-                            this.state.password
+                            this.state.titre
                             } 
                             />
                         </Col>
                     </FormGroup>
 
-                    <FormGroup controlId="formHorizontalPasswordCheck">
+                    <FormGroup controlId="formHorizontalImage">
                         <Col componentClass={ControlLabel} sm={4}>
-                        Password
+                        Upload image
                         </Col>
                         <Col sm={4}>
                         <FormControl
-                            name="passwordCheck"
-                            type="password"
-                            placeholder="Confirm Password"
+                            type="file"
+                            multiple={true}
+                            placeholder="Selectionnez une image"
                             onChange={
-                            this.updateInput
+                                e => {this.onChange(e.target.files[0])}
                             }
-                            value={
-                            this.state.passwordCheck
-                            }
+                            // onSubmit={
+                            //     this.onFormSubmit
+                            // }
                         />
                         </Col>
                     </FormGroup>
@@ -139,13 +202,12 @@ class CreateAnnonce extends React.Component {
                         <Col smOffset={4} sm={4}>
                         <Button 
                             type="submit"
-                            disabled={this.state.disableBtn}
                             onClick={
-                            this.handleRegister
-                            }> Sign in </Button>
+                                this.handleCreateAnnonce
+                            }>Créer l'annonce</Button>
                         </Col>
                     </FormGroup>
-                </Form>;
+                </Form>
             </div>
         )
     }

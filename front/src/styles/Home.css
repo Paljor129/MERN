@@ -1,0 +1,11 @@
+@media (min-width: 768px) {
+    Card.Group {
+        align-content: center!important;
+    }
+}
+
+@media (min-width: 1200px) {
+    Card.Group {
+        align-content: center!important;
+    }
+}

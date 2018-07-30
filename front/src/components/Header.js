@@ -1,52 +1,59 @@
 import React, { Fragment } from 'react'
-import axios from 'axios'
+// import '../styles/Global.css'
 
 import { NavLink } from 'react-router-dom'
 import { Navbar, Nav, NavItem } from 'react-bootstrap'
 import { LinkContainer } from 'react-router-bootstrap'
 
-class Header extends React.PureComponent {
+class Header extends React.Component {
   
   handleLogout = e => {
     e.preventDefault();
-    axios.get('/auth/logout')
-      .then(res => {
-        // console.log(res);
-        this.props.history.push('/login')
-      })
+    console.log(this.state);
+    this.props.unconnect()
   }
 
   render() {
-    
     return(
       <div>
-        <Navbar inverse collapseOnSelect>
+        <Navbar inverse collapseOnSelect color="blue">
           <Navbar.Header>
             <Navbar.Brand>
-              <NavLink to="/" activeClassName="is-active"> Home </NavLink>
+              <NavLink to="/" activeClassName="is-active">Accueil</NavLink>
             </Navbar.Brand>
             <Navbar.Toggle />
           </Navbar.Header>
           <Navbar.Collapse>
             <Nav>
-              <LinkContainer to="/createAnnonce" >
-                <NavItem > CreateAnnonce </NavItem>
-              </LinkContainer>
+              {this.props.userHasAnnonce
+                ?<LinkContainer to="/annonce" >
+                  <NavItem>Annonce</NavItem>
+                </LinkContainer>
+                :<LinkContainer to="/createAnnonce" >
+                  <NavItem>Créer Annonce</NavItem>
+                </LinkContainer>
+              }
             </Nav>
             <Nav pullRight>
               { this.props.conn 
-                ? <LinkContainer to="/logout">
-                    <NavItem onClick={this.handleLogout}> Logout </NavItem>
+                ?<Fragment>
+                  <LinkContainer to="/profile">
+                    <NavItem >Profil</NavItem>
                   </LinkContainer>
-                  :<Fragment>
-                    <LinkContainer to="/login" >
-                      <NavItem > Login </NavItem>
-                    </LinkContainer>
+                  <LinkContainer to="/logout">
+                    <NavItem onClick={this.handleLogout}>SE DÉCONNECTER</NavItem>
+                  </LinkContainer>
                   
-                    <LinkContainer to="/register">
-                      <NavItem > Register </NavItem>
-                    </LinkContainer>
-                  </Fragment>
+                </Fragment>
+                :<Fragment>
+                  <LinkContainer to="/login" >
+                    <NavItem >SE CONNECTER</NavItem>
+                  </LinkContainer>
+                
+                  <LinkContainer to="/register">
+                    <NavItem>S'INSCRIRE</NavItem>
+                  </LinkContainer>
+                </Fragment>
               }
             </Nav>
           </Navbar.Collapse>

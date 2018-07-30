@@ -1,5 +1,5 @@
 import React from "react";
-import { withAlert } from "react-alert";
+import '../styles/Global.css'
 
 import {
   Form,
@@ -85,9 +85,10 @@ class Register extends React.PureComponent {
       },
       body: JSON.stringify({ firstname, lastname, email, password })
     })
+    .then(res => res.json())
     .then(res => {
-      console.log(res)
-      this.props.connect()
+      console.log("jdjjjjdj",res)
+      this.props.connect(res)
       this.props.history.push('/createAnnonce')
     })
     .catch(error => {
@@ -106,13 +107,13 @@ class Register extends React.PureComponent {
         <Form horizontal>
           <FormGroup controlId="formHorizontalFirstname">
             <Col componentClass={ControlLabel} sm={4}>
-              First name
+              Nom
             </Col>
             <Col sm={4}>
               <FormControl
                 name="firstname"
                 type="text"
-                placeholder="Firstname"
+                placeholder="Nom"
                 onChange={
                   this.updateInput
                 }
@@ -125,13 +126,13 @@ class Register extends React.PureComponent {
 
           <FormGroup controlId="formHorizontalLastname">
             <Col componentClass={ControlLabel} sm={4}>
-              Last name
+              Prénom
             </Col>
             <Col sm={4}>
               <FormControl 
                 name="lastname"
                 type="text"
-                placeholder = "Lastname"
+                placeholder = "Prénom"
                 onChange={
                   this.updateInput
                 }
@@ -163,13 +164,13 @@ class Register extends React.PureComponent {
 
           <FormGroup controlId="formHorizontalPassword">
             <Col componentClass={ControlLabel} sm={4}>
-              Password
+              Mot de passe
             </Col>
             <Col sm={4}>
               <FormControl 
                 name="password"
                 type="password"
-                placeholder="Password"
+                placeholder="Mot de passe"
                 onChange={
                   this.updateInput
                 }
@@ -182,13 +183,13 @@ class Register extends React.PureComponent {
 
           <FormGroup controlId="formHorizontalPasswordCheck">
             <Col componentClass={ControlLabel} sm={4}>
-              Password
+              Confirmez Mdp
             </Col>
             <Col sm={4}>
               <FormControl
                 name="passwordCheck"
                 type="password"
-                placeholder="Confirm Password"
+                placeholder="Confirmez votre mot de passe"
                 onChange={
                   this.updateInput
                 }
@@ -206,10 +207,10 @@ class Register extends React.PureComponent {
                 disabled={this.state.disableBtn}
                 onClick={
                   this.handleRegister
-                }> Sign up </Button>
+                }>S'inscrire</Button>
             </Col>
           </FormGroup>
-        </Form>;
+        </Form>
       </div>
     );
   }

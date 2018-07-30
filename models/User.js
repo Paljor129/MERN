@@ -1,41 +1,23 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
-
-const AnnonceSchema = new Schema({
-  villename: {
-    type: String,
-    required: true
-  },
-  villename2: {
-    type: String,
-    required: true
-  },
-  period: {
-    type: String,
-    required: true
-  },
-  titre: {
-    type: String,
-    required: true
-  },
-  // date: {
-  //   type: Date,
-  //   default: Date.now
-  // }
-});
+const Annonce = require('./Annonce');
 
 const UserSchema = new Schema({
   firstname: {
     type: String,
-    required: true
+    required: true,
+    trim: true
   },
   lastname: {
     type: String,
-    required: true
+    required: true,
+    trim: true
   },
   email: {
     type: String,
-    required: true
+    unique: true,
+    required: true,
+    trim: true
   },
   password: {
     type: String,
@@ -45,8 +27,17 @@ const UserSchema = new Schema({
     type: Date,
     default: Date.now
   },
-  Annonce: AnnonceSchema
+  annonce: {
+    type: Schema.Types.ObjectId,
+    ref: 'Annonce',
+    require: false
+  },
+  annonces: [{
+    type: Schema.Types.ObjectId,
+    ref: 'Annonce',
+    require: false
+  }]
 });
 
 //create model, i call users n it gonna connect to UserSchema
-mongoose.model('users', UserSchema);
+module.exports = mongoose.model('users', UserSchema);

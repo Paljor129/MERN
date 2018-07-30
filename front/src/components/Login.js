@@ -1,4 +1,5 @@
 import React from 'react';
+import '../styles/Global.css'
 
 import { Form, FormGroup, Col, ControlLabel, FormControl, Button } from 'react-bootstrap';
 
@@ -11,8 +12,8 @@ class Login extends React.PureComponent {
     };
 
     updateInput = e => {
-        // const newState = {};
-        // newState[e.target.name] = e.target.value;
+        //const newState = {};
+        //newState[e.target.name] = e.target.value;
         //e.target.name is for each input (email and password) so its neccesary to put name in each form
         this.setState({[e.target.name] : e.target.value});
     };
@@ -33,9 +34,11 @@ class Login extends React.PureComponent {
                 password
             })
         })
+        .then(res => res.json())
         .then(res => {
-            console.log(res);
-            this.props.connect()
+            console.log("user in login ", res);
+            //Here res is the user that i stored in connect(user)
+            this.props.connect(res)
             this.props.history.push('/');
         })
         .catch(error => {
@@ -94,7 +97,7 @@ class Login extends React.PureComponent {
                                 }> Sign in </Button>
                         </Col>
                     </FormGroup>
-                </Form>;
+                </Form>
             </div>
 
         )

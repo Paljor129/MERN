@@ -1,13 +1,19 @@
-const express = require('express')
-const mongoose = require('mongoose')
-const bcrypt = require('bcryptjs')
-const passport = require('passport')
-const router = express.Router()
+const express = require('express');
+const mongoose = require('mongoose');
+const bcrypt = require('bcryptjs');
+const passport = require('passport');
+const router = express.Router();
 
-const user = require("../models/User")
-// const annonce = require("../models/User")
+// const {ensureAuthenticated} = require('../helpers/auth')
+
+const user = require("../models/User");
 const User = mongoose.model("users");
-// const Annonce = mongoose.model("users");
+
+const annonce = require('../models/Annonce');
+const Annonce = mongoose.model("annonces");
+
+//passport config
+require('../config/passport')(passport)
 
 router.post('/register', (req, res) => {
     console.log(req.body)
@@ -23,10 +29,7 @@ router.post('/register', (req, res) => {
           user
             .save()
             .then(user => {
-                //to add in front
-                // req.flash('sucess message', 'You are now registered and can log in')
-                // res.redirect('/login')
-                res.json({success: true})
+                res.json(user)
             })
             .catch(err => {
                 console.log(err)
@@ -35,6 +38,43 @@ router.post('/register', (req, res) => {
   })
 
 });
+
+//To get all users
+router.get('/users', (req, res) => {
+    User
+        .find({})
+        // .populate('annonce')
+        // .exec()
+        .then(users => {
+            // Annonce
+            //     .find({})
+            //     .then(annonces => {
+            //         res.render('user/index', {
+            //             user: user
+            //         })
+            //     })
+            res.json(users)
+        })
+        .catch(err => {
+            console.log(err);
+        })
+})
+
+router.get('/user/:_id', (req, res) => {
+    console.log("ppppppppp ", req.params._id);
+    User
+        .findById(req.params._id)
+        // .populate('Annonce')
+        .then(user => {
+            res.json(user)
+            console.log(user);
+             
+        })
+        .catch(err => {
+            console.log(err);
+        })
+})
+
 
 //passport middleware
 const passportMiddleware = passport.authenticate('local', {
@@ -47,16 +87,10 @@ router.post('/login', passportMiddleware, (req, res) => {
     res.json(req.user)
 })
 
-router.get('/logout', (req, res) => {
-    req.logout();
-})
+// router.post('/login', (req, res, next) => {
+//     passport.authenticate('local')
+//     (req, res, next)
+// })
 
-router.post('/createAnnonce', (req, res) => {
-    const {villename, villename2, period, titre} = req.body
-    const role = "annonce"
-
-    const annonce = new Annonce({ villename, villename2, period, titre })
-
-})
 
 module.exports = router
