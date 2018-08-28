@@ -2,8 +2,7 @@ import React from 'react';
 import axios from 'axios';
 import '../styles/Home.css'
 import CardAnnonce from './CardAnnonce'
-import { Header, Image } from 'semantic-ui-react';
-import image from '../image/rex.jpg'
+import { Header } from 'semantic-ui-react';
 
 class Home extends React.Component {
     state = {

@@ -1,10 +1,12 @@
 import React from 'react'
 import '../styles/Global.css'
 import { Message, Form, Button } from 'semantic-ui-react'
+const dotenv = require('dotenv')
 
-const cloudName = 'dkhupnzr8'
+dotenv.config()
+
 const preset = 's24frout'
-const URL = `https://api.cloudinary.com/v1_1/${cloudName}/image/upload`
+const URL = process.env.CLOUDINARY_URL
 
 class CreateAnnonce extends React.Component {
     state = {

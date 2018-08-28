@@ -1,11 +1,12 @@
 import React from 'react'
 import axios from 'axios'
-
 import { Message, Form } from 'semantic-ui-react'
+const dotenv = require('dotenv')
 
-const cloudName = 'dkhupnzr8'
+dotenv.config()
+
 const preset = 's24frout'
-const URL = `https://api.cloudinary.com/v1_1/${cloudName}/image/upload`
+const URL = process.env.CLOUDINARY_URL
 
 class UpdateAnnonce extends React.Component {
     state = {
