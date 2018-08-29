@@ -1,13 +1,9 @@
 import React from "react";
-import '../styles/Global.css'
 import { Form, Message, Icon, Button } from 'semantic-ui-react' 
 import { Link } from 'react-router-dom'
-const dotenv = require('dotenv')
-
-dotenv.config()
 
 const preset = 's24frout'
-const URL = process.env.CLOUDINARY_URL
+const URL = 'https://api.cloudinary.com/v1_1/dkhupnzr8/image/upload'
 
 class Register extends React.PureComponent {
   state = {

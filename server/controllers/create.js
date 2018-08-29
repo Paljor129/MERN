@@ -70,7 +70,7 @@ router.get('/user/:_id/match', (req, res) => {
                                 type: 'Point',
                                 coordinates: [user.location.coordinates[0], user.location.coordinates[1]]
                             },
-                            $maxDistance: 1000
+                            $maxDistance: 5000
                         }
                     }
                 })
@@ -89,7 +89,7 @@ router.get('/user/:_id/match', (req, res) => {
                                         type: "Point",
                                         coordinates: [user.annonce.location.coordinates[0], user.annonce.location.coordinates[1]]
                                     },
-                                    $maxDistance: 1000
+                                    $maxDistance: 5000
                                 }
                             }
                         })

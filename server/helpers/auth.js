@@ -3,5 +3,6 @@ module.exports = {
             if(req.isAuthenticated()) {
                 return next()
             }
+            return next(new Error('Not allowed'))
         }
 }

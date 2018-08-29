@@ -6,15 +6,18 @@ const bodyParser = require('body-parser');
 const dotenv = require('dotenv')
 
 dotenv.config()
-
+    
 const app = express();
 
-const mongoUrl = process.env.DATABASE_URL || 'mongodb://localhost:27017/mern';
+app.use(passport.initialize());
+// app.use(passport.session());
+
+const mongoUrl = process.env.DATABASE_URL;
 
 mongoose.promise = global.promise
 mongoose.connect(mongoUrl)
     .then(() => console.log('Mongodb Connected'))
-    .catch(err => console.log('err'));
+    .catch(err => console.log(err));
 
 
 //Returns middleware that only parses JSON and only looks at requests where the Content-Type header matches the type option
@@ -29,14 +32,19 @@ app.use(bodyParser.urlencoded({ extended: true }));
 //Passport Config
 // require('./config/passport')(passport);
 
-app.use('/auth', require('./controllers/auth'))
-app.use('/create', require('./controllers/create'))
+app.use('/auth', require('./server/controllers/auth'))
+app.use('/create', require('./server/controllers/create'))
 
 
 //To connect with front
-app.use('/', express.static(path.join(__dirname, '../front/build')))
+app.use('/', express.static(path.join(__dirname, './front/build')))
 app.use('/*', (req, res) => {
-    res.sendFile(path.join(__dirname, '../front/build/index.html'))
+    res.sendFile(path.join(__dirname, './front/build/index.html'))
+})
+
+app.use(function (err, req, res, next) {
+    console.log(err.stack)
+    res.status(500).send(err.message)
 })
 
 const port = process.env.PORT || 3001;

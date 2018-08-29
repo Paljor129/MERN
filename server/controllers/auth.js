@@ -2,7 +2,8 @@ const express = require('express');
 const bcrypt = require('bcryptjs');
 const passport = require('passport');
 const router = express.Router();
-const ensureAuthenticated = require('../helpers/auth')
+// const ensureAuthenticated = require('../helpers/auth').ensureAuthenticated;
+const auth = require('../helpers/auth');
 const dotenv = require('dotenv')
 
 dotenv.config()
@@ -52,7 +53,7 @@ router.post('/register', (req, res) => {
 });
 
 //To get all users
-router.get('/users', (req, res) => {
+router.get('/users', auth.ensureAuthenticated, (req, res) => {
     User
         .find({})
         .populate('annonce')
@@ -79,12 +80,13 @@ router.get('/user/:_id', (req, res) => {
 
 //passport middleware
 const passportMiddleware = passport.authenticate('local', {
-    session: false
+    session: true
 })
 
 router.post('/login', passportMiddleware, (req, res) => {
-    // console.log(req.body)
+    console.log('login : ',req.body)
     const { email, password } = req.body;
+    // passport.authenticate('local')
     res.json(req.user)
 })
 // router.post('/login', (req, res, next) => {

@@ -11,14 +11,9 @@ module.exports = function(passport) {
           .populate('annonce')
           .then(user => {
             if (!user) {
-              //error null, user false and message
               return done(null, false, {message: 'No user found'});
-              console.log(`User ${user} not found`);
-              
             }
-            console.log(user) 
-
-            //Match password
+            console.log('passport js ',user)
             bcrypt.compare(password, user.password, (err, isMatch) => {
                 if(err) throw err;
                 if(isMatch) {
@@ -29,7 +24,6 @@ module.exports = function(passport) {
                     });
                 }
             })
-            
         })
         .catch(err => {
           res.status(401).send("Vous êtes pas autorisé")
