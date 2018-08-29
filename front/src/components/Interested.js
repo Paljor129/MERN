@@ -21,16 +21,16 @@ class Interested extends React.Component{
             })
     }
 
-    handleDelete = e => {
+    handleDelete = userId => {
+        console.log('userId axios',userId);
+        
         axios
-            .delete('/create/annonce/'+this.props.user.annonce._id, { user_id: this.props.user._id})
+            .delete('/create/annonce/'+this.props.user.annonce._id+'/'+userId)
             .then(res => {
                 res.data
             })
             .catch(err => {
                 console.log('err delete interest : ',err);
-                
-                // res.json(err);
             })
     }
 
@@ -54,8 +54,9 @@ class Interested extends React.Component{
                                         <Icon name='envelope'></Icon>  
                                         Contacter                                    
                                     </Button>
+                                    {/* {JSON.stringify(user)} */}
                                     <Button negative
-                                        onClick={this.handleDelete}>
+                                        onClick={() => this.handleDelete(user._id)}>
                                         <Icon name='trash'></Icon>
                                         Supprimer
                                     </Button>

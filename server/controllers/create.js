@@ -199,11 +199,12 @@ router.get('/annonce/:id', (req, res) => {
 })
 
 router.delete('/annonce/:id', (req, res) => {
+    console.log('user id server ',req.body.user_id);
     const userPromise = User
-    .findByIdAndUpdate({ _id: req.body.user_id }, { $pullAll: { annonces: [req.params.id] } })
+    .findByIdAndUpdate({ _id: req.body.user_id }, { $pull: { annonces: [req.params.id] } })
 
     const annoncePromise = Annonce
-    .findByIdAndUpdate({ _id: req.params.id }, { $pullAll: { users: [req.body.user_id] } })
+    .findByIdAndUpdate({ _id: req.params.id }, { $pull: { users: [req.body.user_id] } })
 
     Promise.all([userPromise, annoncePromise])
         .then(values => {
