@@ -159,18 +159,25 @@ class Router extends React.Component {
                                 )} />
                             <Route
                                 path='/register'
-                                render={(props) => <Register
+                                render={(props) => 
+                                (!this.state.auteur
+                                ?(<Register
                                 {...props}
                                 connect={this
                                 .connect
-                                .bind(this)}/>}/>
+                                .bind(this)}/>)
+                                :(<Redirect to='/' />)
+                                )}/>
                             <Route
                                 path='/login'
-                                render={(props) => <Login
+                                render={(props) => 
+                                (!this.state.auteur
+                                ?(<Login
                                 {...props}
                                 connect={this
                                 .connect
-                                .bind(this)}/>}/>
+                                .bind(this)}/>)
+                                :(<Redirect to='/' />))}/>
                             <Route component={NotFound}/>
                     </Switch>}                      
                     {/* <Footer /> */}

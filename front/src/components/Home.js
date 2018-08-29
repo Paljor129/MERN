@@ -52,7 +52,7 @@ class Home extends React.Component {
                         ?<Header as='h2' textAlign='center'>
                             <Header.Content>Liste des Annonces</Header.Content>
                         </Header>
-                        :<Header></Header>
+                        : <Header textAlign='center'>Aucun resultat</Header>
                     }
                     {/* <Image src={image} fluid></Image> */}
                     <div className='ui three doubling stackable cards'>
