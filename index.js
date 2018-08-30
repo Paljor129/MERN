@@ -47,7 +47,7 @@ app.use(function (err, req, res, next) {
     res.status(500).send(err.message)
 })
 
-const port = 3001;
+const port = process.env.PORT || 3001;
 
 app.listen(port, (err) => {
     if(err) {
