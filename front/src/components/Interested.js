@@ -10,10 +10,19 @@ class Interested extends React.Component{
 
     componentDidMount() {
         console.log('annonce interested ', this.props.user.annonce._id)
+        this.dataRecharge()        
+    }
+
+    componentDidUpdate(prevProps) {
+        if(prevProps.user.annonce !== this.props.user.annonce) {
+            this.dataRecharge()
+        }
+    }
+
+    dataRecharge() {
         axios
-            .get('/create/annonce/'+this.props.user.annonce._id)
+            .get('/annonce/' + this.props.user.annonce._id)
             .then(res => {
-                console.log('res data ', res.data)
                 this.setState({ annonce: res.data })
             })
             .catch(err => {
@@ -21,13 +30,11 @@ class Interested extends React.Component{
             })
     }
 
-    handleDelete = userId => {
-        console.log('userId axios',userId);
-        
+    handleDelete = userId => {        
         axios
             .delete('/create/annonce/'+this.props.user.annonce._id+'/'+userId)
             .then(res => {
-                res.data
+                this.dataRecharge()
             })
             .catch(err => {
                 console.log('err delete interest : ',err);

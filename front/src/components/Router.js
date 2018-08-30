@@ -7,7 +7,6 @@ import Header from './Header'
 import Home from './Home'
 import CreateAnnonce from './CreateAnnonce'
 import Annonce from './Annonce'
-import About from './About'
 import Profile from './Profile'
 import UpdateProfile from './UpdateProfile'
 import Login from './Login'
@@ -15,12 +14,10 @@ import Register from './Register'
 import NotFound from './NotFound'
 import Redirect from 'react-router-dom/Redirect';
 import UpdateAnnonce from './UpdateAnnonce';
-import Footer from './Footer'
 
 
 class Router extends React.Component {
     state = {
-        //JSON.parse() to convert local.storage to boolean bcz local.storage is string
         connected: (localStorage.connected)
             ? JSON.parse(localStorage.connected)
             : false,
@@ -33,8 +30,6 @@ class Router extends React.Component {
     }
 
     connect(user) {
-        console.log("connect user ", user);
-        console.log('coucou', this.state.connected);
         localStorage.connected = true
         this.setState({
             connected: JSON.parse(localStorage.connected)
@@ -126,9 +121,6 @@ class Router extends React.Component {
                                     user={this.state.user}/>)
                                 : (<Redirect to='/login'/>))}/>
                             <Route
-                                path='/about'
-                                component={About} />
-                            <Route
                                 path='/update'
                                 render={(props) => (this.state.auteur
                                 ? (<UpdateAnnonce
@@ -179,8 +171,7 @@ class Router extends React.Component {
                                 .bind(this)}/>)
                                 :(<Redirect to='/' />))}/>
                             <Route component={NotFound}/>
-                    </Switch>}                      
-                    {/* <Footer /> */}
+                    </Switch>}
                 </div>
             </BrowserRouter>
         )

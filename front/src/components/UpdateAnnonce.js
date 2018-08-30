@@ -7,8 +7,6 @@ const URL = 'https://api.cloudinary.com/v1_1/dkhupnzr8/image/upload'
 
 class UpdateAnnonce extends React.Component {
     state = {
-        // location: this.props.user.annonce.location || { cordinates: [], address: "" },
-        // location1: this.props.user.annonce.location1 || { cordinates: [], address: "" },
         address: this.props.user.annonce.address || "",
         titre: this.props.user.annonce.titre || "",
         period: this.props.user.annonce.period || "",
@@ -17,10 +15,6 @@ class UpdateAnnonce extends React.Component {
         file: null
     }
 
-    // updateLocation = loc => e => {
-    //     this.setState({ [loc]: { ...this.state.location, [e.target.name]: e.target.value } })
-    // }
-
     updateInput = e => {
         this.setState({ [e.target.name]: e.target.value })
     }    
@@ -28,7 +22,7 @@ class UpdateAnnonce extends React.Component {
     editAnnonce = e => {
         e.preventDefault()
         axios
-            .put('/create/annonce/' + this.props.user.annonce._id, this.state)//this.state is to update all the details of an annonce
+            .put('/annonce/' + this.props.user.annonce._id, this.state)
             .then(res => {
                 this.setState({ annonce: res.data });
                 this.props.setUser()
@@ -44,7 +38,6 @@ class UpdateAnnonce extends React.Component {
     imageUpload = e => {
         this.state.file
             ? this.fileUpload(this.state.file).then(publicId => {
-                console.log('publicId : ', publicId)
                 publicId && this.setState({ publicId, error: null })
             })
             : this.setState({ error: 'Vous n\'avez  pas selectionné le fichier' })

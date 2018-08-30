@@ -15,7 +15,7 @@ class CardAnnonce extends React.Component {
     close = () => this.setState({ open: false })
 
     componentDidMount() {
-        //to verify if there is an user_id in an users array of Annonce collection
+        //to verify if there is no user_id in an users array of Annonce collection
         //-1 means if there is no user_id
         this.setState({interested: this.props.annonce.users.indexOf(this.props.auteur)>-1})
     }
@@ -28,10 +28,8 @@ class CardAnnonce extends React.Component {
 
     handleInterest = e => {
         e.preventDefault()
-        console.log('annonce id ', this.props.annonce._id)
-        console.log('body auteur ', { user_id: this.props.auteur })
         axios
-            .put('/create/annonce/'+this.props.annonce._id+'/interested', {user_id: this.props.auteur})
+            .put('/annonce/'+this.props.annonce._id+'/interested', {user_id: this.props.auteur})
             .then(res => {
                 this.setState({ annonce: res.data, interested: true })
             })
@@ -41,7 +39,6 @@ class CardAnnonce extends React.Component {
     }
 
     render() {
-        // const dat = toDateString();
         const { open, dimmer } = this.state
         return(
             <div className='ui card'>
@@ -53,7 +50,6 @@ class CardAnnonce extends React.Component {
                         <Image
                             cloudName="dkhupnzr8"
                             publicId={this.props.annonce.auteur.image}
-                            // height={250}
                             crop="scale"
                         />
                     </div>
@@ -62,7 +58,6 @@ class CardAnnonce extends React.Component {
                   <Image
                     cloudName="dkhupnzr8"
                     publicId={this.props.annonce.image}
-                    // height={250}
                     crop="scale"
                     />  
                 </div>
@@ -72,8 +67,6 @@ class CardAnnonce extends React.Component {
                     <div className='description'>{this.props.annonce.auteur.address}</div>
                     <div className='description'>{this.props.annonce.address}</div>
                 </div>
-                
-                {/* <div className='content'> */}
                     <Modal size='medium' className='scrolling' dimmer={dimmer} open={open} onClose={this.close}
                         trigger={<Button color='violet' onClick={this.show('blurring')}> Détail </Button>} closeIcon>
                         <Modal.Header>
@@ -86,7 +79,6 @@ class CardAnnonce extends React.Component {
                                     <Image
                                     cloudName="dkhupnzr8"
                                     publicId={this.props.annonce.image}
-                                    // width={400}
                                     crop="scale" />
                                 </div>
                             </Modal.Content>
@@ -105,14 +97,13 @@ class CardAnnonce extends React.Component {
                                     onClick={
                                         this.props.auteur 
                                         ? this.handleInterest 
-                                        : () => this.props.history.push('/register')}//function pour qu'il marche seulement qu'on click le button
+                                        : () => this.props.history.push('/register')}
                                     />
                             </Modal.Content>
                             
                         </Modal.Content>
                         </div>
                     </Modal>
-                {/* </div> */}
             </div>
         )
     }

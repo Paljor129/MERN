@@ -36,7 +36,6 @@ class UpdateProfile extends React.Component {
     imageUpload = e => {
         this.state.file
             ? this.fileUpload(this.state.file).then(publicId => {
-                console.log('publicId : ', publicId)
                 publicId && this.setState({ publicId, error: null })
             })
             : this.setState({ error: 'Vous n\'avez  pas selectionné le fichier' })

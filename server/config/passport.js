@@ -5,7 +5,6 @@ const User = require("../models/User");
 
 module.exports = function(passport) {
     passport.use(new LocalStrategy({ usernameField: 'email' }, (email, password, done) => {
-        //Match user
         User
           .findOne({ email: email })
           .populate('annonce')
@@ -13,7 +12,6 @@ module.exports = function(passport) {
             if (!user) {
               return done(null, false, {message: 'No user found'});
             }
-            console.log('passport js ',user)
             bcrypt.compare(password, user.password, (err, isMatch) => {
                 if(err) throw err;
                 if(isMatch) {

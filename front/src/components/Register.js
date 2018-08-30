@@ -69,24 +69,18 @@ class Register extends React.PureComponent {
     else return false;
   };
   
-  //Properties binds the instance
-  //Property called handleRegister 
   handleRegister = e => {
-    //prevent the page from submitting
     e.preventDefault();
-    console.log(this.state);
     const { firstname, lastname, email, password, address, image } = this.state;
     fetch("/auth/register", {
       method: "POST",
       headers: {
-        //In req such as POST n PUT, client tells the server what type of data is actually sent
         "Content-type": "application/json"
       },
       body: JSON.stringify({ firstname, lastname, email, password, address, image })
     })
     .then(res => res.json())
     .then(res => {
-      console.log("jdjjjjdj",res)
       this.props.connect(res)
       this.props.history.push('/createAnnonce')
     })
@@ -98,7 +92,6 @@ class Register extends React.PureComponent {
     imageUpload = e => {
       this.state.file
         ? this.fileUpload(this.state.file).then(publicId => {
-          console.log('publicId : ', publicId)
           publicId && this.setState({ publicId, error: null })
         })
         : this.setState({ error: 'Vous n\'avez  pas selectionné le fichier' })
@@ -264,129 +257,3 @@ class Register extends React.PureComponent {
 
 
 export default Register;
-{/* <Form horizontal>
-          <FormGroup controlId="formHorizontalFirstname">
-            <Col componentClass={ControlLabel} sm={4}>
-              Nom
-            </Col>
-            <Col sm={4}>
-              <FormControl
-                name="firstname"
-                type="text"
-                placeholder="Nom"
-                onChange={
-                  this.updateInput
-                }
-                value={
-                  this.state.firstname
-                } 
-                />
-            </Col>
-          </FormGroup>
-
-          <FormGroup controlId="formHorizontalLastname">
-            <Col componentClass={ControlLabel} sm={4}>
-              Prénom
-            </Col>
-            <Col sm={4}>
-              <FormControl 
-                name="lastname"
-                type="text"
-                placeholder = "Prénom"
-                onChange={
-                  this.updateInput
-                }
-                value={
-                  this.state.lastname
-                } 
-                />
-            </Col>
-          </FormGroup>
-
-          <FormGroup controlId="formHorizontalEmail">
-            <Col componentClass={ControlLabel} sm={4}>
-              Email
-            </Col>
-            <Col sm={4}>
-              <FormControl 
-                name="email"
-                type="email"
-                placeholder="Email"
-                onChange={
-                  this.updateInput
-                }
-                value={
-                  this.state.email
-                } 
-                />
-            </Col>
-          </FormGroup>
-          
-          <FormGroup controlId="formHorizontalPassword">
-            <Col componentClass={ControlLabel} sm={4}>
-              Mot de passe
-            </Col>
-            <Col sm={4}>
-              <FormControl 
-                name="password"
-                type="password"
-                placeholder="Mot de passe"
-                onChange={
-                  this.updateInput
-                }
-                value={
-                  this.state.password
-                } 
-                />
-            </Col>
-          </FormGroup>
-
-          <FormGroup controlId="formHorizontalPasswordCheck">
-            <Col componentClass={ControlLabel} sm={4}>
-              Confirmez Mdp
-            </Col>
-            <Col sm={4}>
-              <FormControl
-                name="passwordCheck"
-                type="password"
-                placeholder="Confirmez votre mot de passe"
-                onChange={
-                  this.updateInput
-                }
-                value={
-                  this.state.passwordCheck
-                }
-              />
-            </Col>
-          </FormGroup>
-
-          <FormGroup controlId="formHorizontalAddress">
-            <Col componentClass={ControlLabel} sm={4}>
-              Address
-            </Col>
-            <Col sm={4}>
-              <FormControl
-                name="address"
-                type="text"
-                placeholder="Votre address"
-                onChange={
-                  this.updateInput
-                }
-                value={
-                  this.state.address
-                }
-              />
-            </Col>
-          </FormGroup>
-
-          <FormGroup>
-            <Col smOffset={4} sm={4}>
-              <Button
-                className="btn-success btn-lg"
-                disabled={this.state.disableBtn}
-                onClick={
-                  this.handleRegister
-                }>S'inscrire</Button>
-            </Col>
-          </FormGroup>
-        </Form> */}

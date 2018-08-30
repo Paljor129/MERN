@@ -1,6 +1,7 @@
 const express = require('express');
+const mongoose = require('mongoose')
 const router = express.Router();
-const ensureAuthenticated = require('../helpers/auth');
+const auth = require('../helpers/auth');
 const dotenv = require('dotenv')
 
 dotenv.config()
@@ -12,38 +13,27 @@ const googleMapsClient = require('@google/maps').createClient({
     key : process.env.GOOGLEMAPS_API_KEY
 })
 
-router.post('/annonce', (req, res) => {
+router.post('/', auth.ensureAuthenticated, (req, res) => {
     const { address, location, period, titre, image, description, auteur } = req.body;
-    
-    //je stoke l'auteur quand je crée une annonce
     const annonce = new Annonce({address, location, period, titre, image, description, auteur: auteur });
-
     googleMapsClient.geocode({
         address: annonce.address
     }, ((err, response) => {
         if(err) {
             res.json(err);
         }else {
-            console.log('response address of annonce : ', JSON.stringify(response.json.results))
             annonce.location.coordinates = [response.json.results[0].geometry.location.lng, response.json.results[0].geometry.location.lat]
-
             return annonce
                 .save()
-                //je cherche l'auteur
                 .then(annonce => {
-                    console.log("create annonce : ", annonce);
-                    console.log("create auteur : ", auteur);
                     return User.findById(auteur)
                 })
-                //je fais la mise à jour de l'annonce id dans le user
                 .then(user => {
-                    console.log("create user", user);
                     return user.update({annonce: (annonce._id)})
                 })
-                //Here res is the response from server to get annonce
                 .then(() => res.json(annonce))
                 .catch(err => {
-                    console.log(err);
+                    res.json(err);
                 })
         }
     }))
@@ -51,19 +41,14 @@ router.post('/annonce', (req, res) => {
     
 })
 
-router.get('/user/:_id/match', (req, res) => {
-
+router.get('/:_id/match', (req, res) => {
     User
         .findOne({ _id: req.params._id })
         .populate('annonce')
         .then(user => {
             console.log("user prrrrr ", user);
             Annonce
-
                 .find({
-                    // id: { $in: annonceIds },
-                    // 'auteur.address' : {$text: user.annonce.address},
-                    // 'auteur.location': {
                     location : {
                         $near: {
                             $geometry: {
@@ -75,9 +60,7 @@ router.get('/user/:_id/match', (req, res) => {
                     }
                 })
                 .populate('auteur')
-            
                 .then(annonces => {
-                    console.log('To verify annonces : ', annonces.map((a) => a.titre))
                     const auteurIds = annonces.map((ann) => ann.auteur._id)
                     return User
 
@@ -96,22 +79,19 @@ router.get('/user/:_id/match', (req, res) => {
                         .populate('annonce')
                 })
                 .then(users => {
-                    console.log('match : ', users)
                     res.json(users.map( u => u.annonce))
                 })
                 .catch(err => {
-                    console.log("annonces error : ",err);
                     res.json(err);
                 })
         })
         .catch(err => {
-            console.log(err);
             res.json(err);
         })
 
 })
 
-router.get('/annonces', (req, res) => {
+router.get('/', (req, res) => {
     Annonce
         .find({})
         .populate('auteur')
@@ -119,42 +99,34 @@ router.get('/annonces', (req, res) => {
             res.json(annonces)
         })
         .catch(err => {
-            console.log(err);
+            res.json(err)
         })
-
 })
 
-router.get('/annonce/:_id/pop', (req, res) => {
+router.get('/:_id/pop', (req, res) => {
     Annonce
         .findById(req.params._id)
         .populate('auteur')
         .then(annonce => {
             res.json(annonce)
-            console.log(annonce);
-
-        })
-        .catch(err => {
-            console.log(err);
-            assert.isNotOk(error, 'Promise error');
-            done();
-        })
-})
-
-//to edit an annonce
-router.put('/annonce/:id', (req, res) => {
-    Annonce
-        .findByIdAndUpdate(req.params.id, { $set : req.body}, { new: true })
-        .then(annonce => {
-            res.json(annonce)
-            console.log('annonce modifier : ',annonce);
         })
         .catch(err => {
             res.json(err);
         })
 })
 
-//to push annonce_id in users collection & user_id in annonces collection
-router.put('/annonce/:id/interested', (req, res) => {
+router.put('/:id', (req, res) => {
+    Annonce
+        .findByIdAndUpdate(req.params.id, { $set : req.body}, { new: true })
+        .then(annonce => {
+            res.json(annonce)
+        })
+        .catch(err => {
+            res.json(err);
+        })
+})
+
+router.put('/:id/interested', (req, res) => {
 
     const userPromise = User
         .findOne(
@@ -180,8 +152,7 @@ router.put('/annonce/:id/interested', (req, res) => {
         })
 })
 
-//Pass an array of objects with properties to be populated
-router.get('/annonce/:id', (req, res) => {
+router.get('/:id', (req, res) => {
     Annonce
         .findById(req.params.id)
         .populate({
@@ -193,23 +164,24 @@ router.get('/annonce/:id', (req, res) => {
         .then(annonce => {
             res.json(annonce)
         }).catch(err => {
-            console.log(err);
+            res.json(err);
         })
 
 })
 
-router.delete('/annonce/:id', (req, res) => {
-    console.log('user id server ',req.body.user_id);
+router.delete('/:id/:user_id', auth.ensureAuthenticated, (req, res) => {
     const userPromise = User
-    .findByIdAndUpdate({ _id: req.body.user_id }, { $pull: { annonces: [req.params.id] } })
+        .update({ _id: req.params.user_id }, { $pull: { annonces: mongoose.Types.ObjectId(req.params.id) } })
 
     const annoncePromise = Annonce
-    .findByIdAndUpdate({ _id: req.params.id }, { $pull: { users: [req.body.user_id] } })
+        .update({ _id: req.params.id }, { $pull: { users: mongoose.Types.ObjectId(req.params.user_id) } })
 
     Promise.all([userPromise, annoncePromise])
         .then(values => {
-            console.log('delete interest : ', values);
             res.json(values)
+        })
+        .catch(err => {
+            res.json(err)
         })
 })
 

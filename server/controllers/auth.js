@@ -2,40 +2,33 @@ const express = require('express');
 const bcrypt = require('bcryptjs');
 const passport = require('passport');
 const router = express.Router();
-// const ensureAuthenticated = require('../helpers/auth').ensureAuthenticated;
 const auth = require('../helpers/auth');
 const dotenv = require('dotenv')
 
 dotenv.config()
 
 const User = require('../models/User');
-//passport config
+
 require('../config/passport')(passport)
 
 const googleMapsClient = require('@google/maps').createClient({
     key: process.env.GOOGLEMAPS_API_KEY
 })
 
-router.post('/register', (req, res) => {
+router.post('/register', auth.ensureAuthenticated, (req, res) => {
   const { firstname, lastname, email, password, address, location, image } = req.body;
   const user = new User({ firstname, lastname, email, password, address, location, image })
-
   bcrypt.genSalt(10, (err, salt) => {
       bcrypt.hash(user.password, salt, (err, hash) => {
           if(err) throw err;
-          user.password = hash; 
-          
+          user.password = hash;
           googleMapsClient.geocode({
                 address: user.address
             }, ((err, response) => {
                 if (err) {
                     res.json(err);
-                    console.log('error error : ',err)
                 } else {
-                    console.log('response address ', JSON.stringify(response.json.results))
                     user.location.coordinates = [response.json.results[0].geometry.location.lng, response.json.results[0].geometry.location.lat]
-                    console.log('user location', user.location);
-
                     return user
                         .save()
                         .then(user => {
@@ -43,7 +36,6 @@ router.post('/register', (req, res) => {
                         })
                         .catch(err => {
                             res.json(err)
-                            console.log(err)
                         })
                 }
             })
@@ -52,8 +44,7 @@ router.post('/register', (req, res) => {
   })    
 });
 
-//To get all users
-router.get('/users', auth.ensureAuthenticated, (req, res) => {
+router.get('/users', (req, res) => {
     User
         .find({})
         .populate('annonce')
@@ -61,7 +52,7 @@ router.get('/users', auth.ensureAuthenticated, (req, res) => {
             res.json(users)
         })
         .catch(err => {
-            console.log(err);
+            res.json(err);
         })
 })
 
@@ -73,20 +64,16 @@ router.get('/user/:_id', (req, res) => {
             res.json(user)
         })
         .catch(err => {
-            console.log(err);
+            res.json(err);
         })
 })
 
-
-//passport middleware
 const passportMiddleware = passport.authenticate('local', {
     session: true
 })
 
 router.post('/login', passportMiddleware, (req, res) => {
-    console.log('login : ',req.body)
     const { email, password } = req.body;
-    // passport.authenticate('local')
     res.json(req.user)
 })
 // router.post('/login', (req, res, next) => {
@@ -99,7 +86,6 @@ router.put('/user/:id', (req, res) => {
         .findByIdAndUpdate(req.params.id, { $set: req.body }, { new: true })
         .then(user => {
             res.json(user)
-            console.log('user Profile : ',user)
         })
         .catch(err => {
             res.json(err)

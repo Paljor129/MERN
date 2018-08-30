@@ -9,9 +9,6 @@ class Login extends React.PureComponent {
     };
 
     updateInput = e => {
-        //const newState = {};
-        //newState[e.target.name] = e.target.value;
-        //e.target.name is for each input (email and password) so its neccesary to put name in each form
         this.setState({[e.target.name] : e.target.value});
     };
 
@@ -23,7 +20,6 @@ class Login extends React.PureComponent {
         fetch("/auth/login", {
             method: "POST",
             headers: {
-                //In req such as POST n PUT, client tells the server what type of data is actually sent
                 "Content-type": "application/json"
             },
             body: JSON.stringify({
@@ -33,7 +29,6 @@ class Login extends React.PureComponent {
         })
         .then(res => res.json())
         .then(res => {
-            console.log("user in login ", res);
             //Here res is the user that i stored in connect(user)
             this.props.connect(res)
             this.props.history.push('/');
@@ -52,7 +47,6 @@ class Login extends React.PureComponent {
                         <Message
                             attached
                             header='Connectez-vous avec votre email et mot de passe'
-                            // content='Connectez-vous avec votre email et mot de passe'
                         />
                         <div className="ui form">
                             <div className="field">

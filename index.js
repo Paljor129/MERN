@@ -33,7 +33,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 // require('./config/passport')(passport);
 
 app.use('/auth', require('./server/controllers/auth'))
-app.use('/create', require('./server/controllers/create'))
+app.use('/annonce', require('./server/controllers/annonce'))
 
 
 //To connect with front
@@ -47,7 +47,7 @@ app.use(function (err, req, res, next) {
     res.status(500).send(err.message)
 })
 
-const port = process.env.PORT || 3001;
+const port = 3001;
 
 app.listen(port, (err) => {
     if(err) {

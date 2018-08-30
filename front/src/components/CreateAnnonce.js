@@ -15,11 +15,7 @@ class CreateAnnonce extends React.Component {
         disableBtn: true
     }
 
-    // updateLocation = loc => e => {
-    //     this.setState({[loc]: {...this.state.location,[e.target.name]: e.target.value }})
-    // }
     updateInput = async e => {
-        console.log(this.state[e.target.name])
         const newState = {};
         newState[e.target.name] = e.target.value;
         await this.setState(newState);
@@ -58,7 +54,7 @@ class CreateAnnonce extends React.Component {
     createAnnonce = e => {
         e.preventDefault()
         const { address, period, titre, image, description } = this.state
-        fetch('/create/annonce', {
+        fetch('/annonce/', {
             method: 'POST',
             headers: {
                 "Content-type": "application/json"
@@ -78,7 +74,6 @@ class CreateAnnonce extends React.Component {
     imageUpload = e => {
         this.state.file
             ? this.fileUpload(this.state.file).then(publicId => {
-                console.log('publicId : ', publicId)
                 publicId && this.setState({ publicId, error: null })
             })
             : this.setState({ error: 'Vous n\'avez  pas selectionné le fichier' })

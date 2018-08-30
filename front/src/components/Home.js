@@ -13,10 +13,7 @@ class Home extends React.Component {
         this.dataRecharge()
     }
 
-    //it will update only when auteur will change
     componentDidUpdate(prevProps) {
-        console.log(prevProps);
-        
         if(prevProps.auteur !== this.props.auteur) {
             this.dataRecharge()
         }
@@ -26,7 +23,7 @@ class Home extends React.Component {
     dataRecharge() {
         if (this.props.auteur) {
             axios
-                .get('/create/user/'+this.props.auteur+'/match')
+                .get('/annonce/'+this.props.auteur+'/match')
                 .then(res => {
                     this.setState({ annonce: res.data });
                 })
@@ -35,7 +32,7 @@ class Home extends React.Component {
                 })
         } else {
             axios
-                .get('/create/annonces')
+                .get('/annonce/')
                 .then(res => {
                     this.setState({ annonce: res.data });
                 })
@@ -52,9 +49,8 @@ class Home extends React.Component {
                         ?<Header as='h2' textAlign='center'>
                             <Header.Content>Liste des Annonces</Header.Content>
                         </Header>
-                        : <Header textAlign='center'>Aucun resultat</Header>
+                        : <Header></Header>
                     }
-                    {/* <Image src={image} fluid></Image> */}
                     <div className='ui three doubling stackable cards'>
                         {this.state.annonce.length > 0 && this
                             .state
