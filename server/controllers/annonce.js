@@ -169,7 +169,7 @@ router.get('/:id', (req, res) => {
 
 })
 
-router.delete('/:id/:user_id', auth.ensureAuthenticated, (req, res) => {
+router.delete('/:id/:user_id', (req, res) => {
     const userPromise = User
         .update({ _id: req.params.user_id }, { $pull: { annonces: mongoose.Types.ObjectId(req.params.id) } })
 

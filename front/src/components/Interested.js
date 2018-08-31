@@ -32,7 +32,7 @@ class Interested extends React.Component{
 
     handleDelete = userId => {        
         axios
-            .delete('/create/annonce/'+this.props.user.annonce._id+'/'+userId)
+            .delete('/annonce/'+this.props.user.annonce._id+'/'+userId)
             .then(res => {
                 this.dataRecharge()
             })

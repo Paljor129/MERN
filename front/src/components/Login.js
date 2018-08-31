@@ -1,6 +1,8 @@
 import React from 'react';
 import { Divider, Header, Message } from 'semantic-ui-react'
 import Link from 'react-router-dom/Link';
+import {Provider as AlertProvider} from 'react-alert'
+import AlertTemplate from 'react-alert-template-basic'
 
 class Login extends React.PureComponent {
     state = {
@@ -32,6 +34,10 @@ class Login extends React.PureComponent {
             //Here res is the user that i stored in connect(user)
             this.props.connect(res)
             this.props.history.push('/');
+            <AlertProvider template={AlertTemplate}>
+                alert.show('Oh look, an alert!')
+                Show Alert
+            </AlertProvider>
         })
         .catch(error => {
             console.log(error)

@@ -10,7 +10,7 @@ module.exports = function(passport) {
           .populate('annonce')
           .then(user => {
             if (!user) {
-              return done(null, false, {message: 'No user found'});
+              return done(null, false, {message: 'User or password incorrect'});
             }
             bcrypt.compare(password, user.password, (err, isMatch) => {
                 if(err) throw err;
@@ -18,7 +18,7 @@ module.exports = function(passport) {
                     return done(null, user)
                 } else {
                     return done(null, false, {
-                      message: "Password Incorrect"
+                      message: "User or password incorrect"
                     });
                 }
             })

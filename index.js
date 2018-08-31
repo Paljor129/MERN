@@ -4,13 +4,26 @@ const passport = require('passport');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const dotenv = require('dotenv')
+const cookieParser = require('cookie-parser')
+const session = require('express-session')
 
 dotenv.config()
     
 const app = express();
 
+app.use(cookieParser())
+
+app.use(session({
+    secret: 'paljor129',
+    cookie: {
+        maxAge: 2628000000
+    },
+    resave: false,
+    saveUninitialized: true
+}));
+
 app.use(passport.initialize());
-// app.use(passport.session());
+app.use(passport.session());
 
 const mongoUrl = process.env.DATABASE_URL;
 
@@ -30,7 +43,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 // })
 
 //Passport Config
-// require('./config/passport')(passport);
+require('./server/config/passport')(passport);
 
 app.use('/auth', require('./server/controllers/auth'))
 app.use('/annonce', require('./server/controllers/annonce'))

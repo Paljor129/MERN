@@ -9,8 +9,6 @@ dotenv.config()
 
 const User = require('../models/User');
 
-require('../config/passport')(passport)
-
 const googleMapsClient = require('@google/maps').createClient({
     key: process.env.GOOGLEMAPS_API_KEY
 })
@@ -69,17 +67,14 @@ router.get('/user/:_id', (req, res) => {
 })
 
 const passportMiddleware = passport.authenticate('local', {
-    session: true
+    session: true,
+    failureFlash: true
 })
 
 router.post('/login', passportMiddleware, (req, res) => {
     const { email, password } = req.body;
     res.json(req.user)
 })
-// router.post('/login', (req, res, next) => {
-//     passport.authenticate('local')
-//     (req, res, next)
-// })
 
 router.put('/user/:id', (req, res) => {
     User
