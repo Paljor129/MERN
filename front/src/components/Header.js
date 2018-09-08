@@ -37,6 +37,11 @@ class Header extends React.Component {
                   <NavItem>Créer Annonce</NavItem>
                 </LinkContainer>
               }
+              {this.props.userHasAnnonce && 
+                <LinkContainer to="/annonceMatched" >
+                  <NavItem>Annonces corréspondant</NavItem>
+                </LinkContainer>
+              }
             </Nav>
             <Nav pullRight>
               

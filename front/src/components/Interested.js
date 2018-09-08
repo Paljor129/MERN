@@ -47,7 +47,7 @@ class Interested extends React.Component{
                     {this.state.annonce && this.state.annonce.users[0]
                         ?<Message
                         attached
-                        header='Listes des utilisataires qui ont été interessé'
+                        header='Liste des utilisateurs qui sont intéressés'
                         />
                         :<div></div>
                     }

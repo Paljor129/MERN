@@ -1,5 +1,7 @@
 import React from 'react'
 import { Message, Form, Button } from 'semantic-ui-react'
+import PlacesAutocomplete, { geocodeByAddress, getLatLng } from 'react-places-autocomplete'
+import classnames from '../helpers'
 
 const preset = 's24frout'
 const URL = 'https://api.cloudinary.com/v1_1/dkhupnzr8/image/upload'
@@ -12,7 +14,11 @@ class CreateAnnonce extends React.Component {
         image: "",
         description: "",
         file: null,
-        disableBtn: true
+        disableBtn: true,
+        errorMessage: '',
+        latitude: null,
+        longitude: null,
+        isGeocoding: false,
     }
 
     updateInput = async e => {
@@ -21,6 +27,46 @@ class CreateAnnonce extends React.Component {
         await this.setState(newState);
         this.canSendForm();
     }
+
+    handleChange = address => {
+        this.setState({
+            address,
+            latitude: null,
+            longitude: null,
+            errorMessage: '',
+        });
+    };
+
+    handleSelect = selected => {
+        this.setState({ isGeocoding: true, address: selected });
+        geocodeByAddress(selected)
+            .then(results => getLatLng(results[0]))
+            .then(({ lat, lng }) => {
+                this.setState({
+                    latitude: lat,
+                    longitude: lng,
+                    isGeocoding: false,
+                });
+            })
+            .catch(error => {
+                this.setState({ isGeocoding: false });
+            });
+    };
+
+    handleCloseClick = () => {
+        this.setState({
+            address: '',
+            latitude: null,
+            longitude: null,
+        });
+    };
+
+    handleError = (status, clearSuggestions) => {
+        console.log('Error from Google Maps API', status);
+        this.setState({ errorMessage: status }, () => {
+            clearSuggestions();
+        });
+    };
 
     nonEmptyString = field => {
         if (typeof field === "string" && field !== "") return true;
@@ -38,11 +84,12 @@ class CreateAnnonce extends React.Component {
     };
 
     checkNonEmptyFields = () => {
-        const { address, period, titre, description } = this.state;
+        const { address, period, titre, image, description } = this.state;
         if (
             this.nonEmptyString(address) &&
             this.nonEmptyString(period) &&
             this.nonEmptyString(titre) &&
+            this.nonEmptyString(image) &&
             this.nonEmptyString(description)
         ) {
             return true;
@@ -109,19 +156,6 @@ class CreateAnnonce extends React.Component {
                     header='Formulaire pour créer votre annonce'
                 />
                 <Form className='attached fluid segment'>
-                    <Form.TextArea
-                        icon='location arrow'
-                        iconPosition='left'
-                        name='address'
-                        label='Address'
-                        placeholder='Votre address de travail'
-                        type='text'
-                        onChange={
-                            this.updateInput
-                        }
-                        value={
-                            this.state.address
-                        } />
                     <Form.Input
                         icon='heading'
                         iconPosition='left'
@@ -135,12 +169,60 @@ class CreateAnnonce extends React.Component {
                         value={
                             this.state.titre
                         } />
+                    
+                    <PlacesAutocomplete
+                        value={this.state.address}
+                        onChange={this.handleChange}
+                        onSelect={this.handleSelect}
+                        onError={this.handleError}
+                        shouldFetchSuggestions={this.state.address.length > 2}
+                    >
+
+                        {({ getInputProps, suggestions, getSuggestionItemProps }) => {
+                            return (
+                                <div className="search-bar-container">
+                                    <div className="search-input-container">
+                                        <label>Adresse</label>
+                                        <input
+                                            {...getInputProps({
+                                                placeholder: 'Votre adresse de travail...',
+                                                className: 'search-input',
+                                            })}
+                                        />
+                                    </div>
+                                    {suggestions.length > 0 && (
+                                        <div className="autocomplete-container">
+                                            {suggestions.map(suggestion => {
+                                                const className = classnames('suggestion-item', {
+                                                    'suggestion-item--active': suggestion.active,
+                                                });
+
+                                                return (
+                                                    <div
+                                                        {...getSuggestionItemProps(suggestion, { className })}
+                                                    >
+                                                        <strong>
+                                                            {suggestion.formattedSuggestion.mainText}
+                                                        </strong>{' '}
+                                                        <small>
+                                                            {suggestion.formattedSuggestion.secondaryText}
+                                                        </small>
+                                                    </div>
+                                                );
+                                            })}
+                                        </div>
+                                    )}
+                                </div>
+                            );
+                        }}
+                    </PlacesAutocomplete>
+
                     <Form.Input
                         icon='calendar alternate'
                         iconPosition='left'
                         name='period'
-                        label='Période de disponiblité'
-                        placeholder='Par example le mois de janvier'
+                        label='Période recherchée (Uniquement pour information)'
+                        placeholder='Par exemple de janvier à mars 2019'
                         type='text'
                         onChange={
                             this.updateInput

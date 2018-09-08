@@ -13,7 +13,7 @@ const googleMapsClient = require('@google/maps').createClient({
     key : process.env.GOOGLEMAPS_API_KEY
 })
 
-router.post('/', auth.ensureAuthenticated, (req, res) => {
+router.post('/', (req, res) => {
     const { address, location, period, titre, image, description, auteur } = req.body;
     const annonce = new Annonce({address, location, period, titre, image, description, auteur: auteur });
     googleMapsClient.geocode({
@@ -46,7 +46,6 @@ router.get('/:_id/match', (req, res) => {
         .findOne({ _id: req.params._id })
         .populate('annonce')
         .then(user => {
-            console.log("user prrrrr ", user);
             Annonce
                 .find({
                     location : {
@@ -79,7 +78,10 @@ router.get('/:_id/match', (req, res) => {
                         .populate('annonce')
                 })
                 .then(users => {
-                    res.json(users.map( u => u.annonce))
+                    console.log('users match ', users)
+                    res.json(users
+                        // .map( u => u)
+                    )
                 })
                 .catch(err => {
                     res.json(err);

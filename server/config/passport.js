@@ -18,7 +18,7 @@ module.exports = function(passport) {
                     return done(null, user)
                 } else {
                     return done(null, false, {
-                      message: "User or password incorrect"
+                      message: "Email ou mot de passe incorrect"
                     });
                 }
             })

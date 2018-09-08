@@ -1,6 +1,8 @@
 import React from "react";
 import { Form, Message, Icon, Button } from 'semantic-ui-react' 
 import { Link } from 'react-router-dom'
+import PlacesAutocomplete, {geocodeByAddress, getLatLng} from 'react-places-autocomplete';
+import classnames from '../helpers'
 
 const preset = 's24frout'
 const URL = 'https://api.cloudinary.com/v1_1/dkhupnzr8/image/upload'
@@ -15,7 +17,50 @@ class Register extends React.PureComponent {
     address: "",
     image: "",
     file: null,
-    disableBtn: true
+    disableBtn: true,
+    errorMessage: '',
+    latitude: null,
+    longitude: null,
+    isGeocoding: false
+  };
+
+  handleChange = address => {
+    this.setState({ 
+      address,
+      latitude: null,
+      longitude: null,
+      errorMessage: '',
+    });
+  };
+
+  handleSelect = selected => {
+    this.setState({ isGeocoding: true, address: selected });
+    geocodeByAddress(selected)
+      .then(results => getLatLng(results[0]))
+      .then(({ lat, lng }) => {
+        this.setState({
+          latitude: lat,
+          longitude: lng,
+          isGeocoding: false,
+        });
+      })
+      .catch(error => {
+        this.setState({ isGeocoding: false });
+      });
+  };
+
+  handleCloseClick = () => {
+    this.setState({
+      address: '',
+      latitude: null,
+      longitude: null,
+    });
+  };
+
+  handleError = (status, clearSuggestions) => { 
+    this.setState({ errorMessage: status }, () => {
+      clearSuggestions();
+    });
   };
 
   //whenever we change input, it will recreate the state
@@ -49,14 +94,15 @@ class Register extends React.PureComponent {
   };
   
   checkNonEmptyFields = () => {
-    const { firstname, lastname, email, password, passwordCheck, address } = this.state;
+    const { firstname, lastname, email, password, passwordCheck, address, image } = this.state;
     if (
       this.nonEmptyString(firstname) &&
       this.nonEmptyString(lastname) &&
       this.nonEmptyString(email) &&
       this.nonEmptyString(password) &&
       this.nonEmptyString(passwordCheck) &&
-      this.nonEmptyString(address)
+      this.nonEmptyString(address) &&
+      this.nonEmptyString(image)
     ) {
       return true;
     } else {
@@ -124,8 +170,8 @@ class Register extends React.PureComponent {
       <div className='ui container'>
         <Message
           attached
-          header='Bienvenue dans notre site!'
-          content='Remplir les champs ci-dessous pour créer un compte'
+          header='Bienvenue dans notre site !'
+          content='Remplir les champs ci-dessous pour créer un compte (Tous les champs sont obligatoires)'
         />
           <Form className='attached fluid segment'>
             <Form.Group widths='equal'>
@@ -220,19 +266,58 @@ class Register extends React.PureComponent {
                   </div>
                 </Form.Input>
               </Form.Group>
-            <Form.TextArea
-                icon='home'
-                iconPosition='left'
-                name='address'
-                label='Address'
-                placeholder='Votre address' 
-                type='text' 
-                onChange={
-                  this.updateInput
-                }
-                value={
-                  this.state.address
-                }  />
+
+          <PlacesAutocomplete
+            value={this.state.address}
+            onChange={this.handleChange}
+            onSelect={this.handleSelect}
+            onError={this.handleError}
+            shouldFetchSuggestions={this.state.address.length > 2}
+          >
+
+            {({ getInputProps, suggestions, getSuggestionItemProps }) => {
+              return (
+                <div className="search-bar-container">
+                  <div className="search-input-container">
+                    <label>Adresse</label>
+                    <input
+                      {...getInputProps({
+                        name: 'address',
+                        placeholder: 'Votre adresse de travail...',
+                        className: 'search-input',
+                      })}
+                    />
+                  </div>
+                  {suggestions.length > 0 && (
+                    <div className="autocomplete-container">
+                      {suggestions.map(suggestion => {
+                        const className = classnames('suggestion-item', {
+                          'suggestion-item--active': suggestion.active,
+                        });
+
+                        return (
+                          <div
+                            {...getSuggestionItemProps(suggestion, { className })}
+                          >
+                            <strong>
+                              {suggestion.formattedSuggestion.mainText}
+                            </strong>{' '}
+                            <small>
+                              {suggestion.formattedSuggestion.secondaryText}
+                            </small>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+              );
+            }}
+          </PlacesAutocomplete>
+          {this.state.errorMessage.length > 0 && (
+            <div className="error-message">{this.state.errorMessage}</div>
+          )}
+
             <Button
               size='big'
               color='green'

@@ -13,7 +13,7 @@ const googleMapsClient = require('@google/maps').createClient({
     key: process.env.GOOGLEMAPS_API_KEY
 })
 
-router.post('/register', auth.ensureAuthenticated, (req, res) => {
+router.post('/register', (req, res) => {
   const { firstname, lastname, email, password, address, location, image } = req.body;
   const user = new User({ firstname, lastname, email, password, address, location, image })
   bcrypt.genSalt(10, (err, salt) => {
@@ -67,13 +67,13 @@ router.get('/user/:_id', (req, res) => {
 })
 
 const passportMiddleware = passport.authenticate('local', {
-    session: true,
-    failureFlash: true
+    session: true
 })
 
 router.post('/login', passportMiddleware, (req, res) => {
     const { email, password } = req.body;
     res.json(req.user)
+    // if (info) return res.send(info)
 })
 
 router.put('/user/:id', (req, res) => {

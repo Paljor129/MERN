@@ -7,6 +7,7 @@ import Header from './Header'
 import Home from './Home'
 import CreateAnnonce from './CreateAnnonce'
 import Annonce from './Annonce'
+import AnnonceMatched from './AnnonceMatched'
 import Profile from './Profile'
 import UpdateProfile from './UpdateProfile'
 import Login from './Login'
@@ -101,7 +102,9 @@ class Router extends React.Component {
                                     (props) => 
                                     <Home 
                                     {...props} 
-                                    auteur={this.state.auteur}/>}
+                                    auteur={this.state.auteur}
+                                    userHasAnnonce={this.state.userHasAnnonce}
+                                    />}
                             />
                             <Route
                                 path='/createAnnonce'
@@ -119,6 +122,15 @@ class Router extends React.Component {
                                 ? (<Annonce 
                                     {...props} 
                                     user={this.state.user}/>)
+                                : (<Redirect to='/login'/>))}/>
+                            <Route
+                                path='/annonceMatched'
+                                render={(props) => (this.state.auteur
+                                ? (<AnnonceMatched 
+                                    {...props} 
+                                    auteur={this.state.auteur}
+                                    userHasAnnonce={this.state.userHasAnnonce}
+                                    />)
                                 : (<Redirect to='/login'/>))}/>
                             <Route
                                 path='/update'

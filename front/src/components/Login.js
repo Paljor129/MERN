@@ -29,15 +29,21 @@ class Login extends React.PureComponent {
                 password
             })
         })
+        // .then((res, dispatch) => {
+        //     dispatch({
+        //     type: 'FLASH',
+        //     payload: res.data.message
+        //     })
+        // })
         .then(res => res.json())
         .then(res => {
             //Here res is the user that i stored in connect(user)
             this.props.connect(res)
             this.props.history.push('/');
-            <AlertProvider template={AlertTemplate}>
-                alert.show('Oh look, an alert!')
-                Show Alert
-            </AlertProvider>
+            // <AlertProvider template={AlertTemplate}>
+            //     alert.show('Oh look, an alert!')
+            //     Show Alert
+            // </AlertProvider>
         })
         .catch(error => {
             console.log(error)
