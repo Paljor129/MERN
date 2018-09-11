@@ -1,19 +1,24 @@
 import React from 'react'
-import { Button, Header, Modal } from 'semantic-ui-react';
+import { Button, Header, Modal, Form, Comment } from 'semantic-ui-react';
 import { Image } from 'cloudinary-react'
 import axios from 'axios'
-import '../styles/CardAnnonce.css'
 import moment from 'moment'
 
 class CardAnnonce extends React.Component {
     state = {
         open: false,
         interested: false,
-        annonce: []
+        annonce: [],
+        comment: '',
+        ann: []
     }
 
     show = dimmer => () => this.setState({ dimmer, open: true })
     close = () => this.setState({ open: false })
+
+    updateInput = e => {
+        this.setState({ [e.target.name]: e.target.value });
+    };
 
     handleInterest = e => {
         e.preventDefault()
@@ -27,12 +32,53 @@ class CardAnnonce extends React.Component {
             })
     }
 
+    componentDidMount() {
+        this.dataRecharge()
+    }
+
+    componentDidUpdate(prevProps) {
+        console.log('prevProps ', prevProps.user.annonce.comments);
+        if (prevProps.user.annonce !== this.props.user.annonce) {
+            this.dataRecharge()
+        }
+    }
+    
+    dataRecharge() {
+        axios
+            .get('/comment/'+this.props.user.annonce._id+'/comments')
+            .then(res => {
+                this.setState({ann: res.data})
+            })
+            .catch(err => {
+                console.log(err);
+            })
+    }
+
+    handleComment = e => {
+        e.preventDefault()        
+        const { comment } = this.state
+        fetch('/comment/'+this.props.user.annonce._id+'/'+this.props.auteur, {
+            method: 'POST',
+            headers: {
+                "Content-type": "application/json"
+            },
+            body: JSON.stringify({ comment })
+        })
+        .then(res => {
+            this.dataRecharge()
+            res.json()
+        })
+        .catch(err => {
+            console.log(err)
+        })
+    }
+
     render() {
         const { open, dimmer } = this.state
         return(
             <div className='ui card'>
-                <div class="content">
-                    <div class="right floated meta">
+                <div className="content">
+                    <div className="right floated meta">
                         <div className='description'>Publié le {moment(this.props.user.annonce.date).format('DD-MMM-YYYY')}</div>
                     </div>
                     <div className='ui avatar image' >
@@ -53,8 +99,7 @@ class CardAnnonce extends React.Component {
                 
                 <div className='content'>
                     <div className='header'>{this.props.user.annonce.titre}</div>
-                    <div className='description'>{this.props.user.address}</div>
-                    <div className='description'>{this.props.user.annonce.address}</div>
+                    <div className='description'>{this.props.user.annonce.period}</div>
                 </div>
                     <Modal size='medium' className='scrolling' dimmer={dimmer} open={open} onClose={this.close}
                         trigger={<Button color='violet' onClick={this.show('blurring')}> Détail </Button>} closeIcon>
@@ -81,13 +126,41 @@ class CardAnnonce extends React.Component {
                                     content='Interessé'
                                     icon='exchange'
                                     labelPosition='right'
-                                    size='big'
+                                    size='large'
                                     disabled={this.state.interested}
                                     onClick={
-                                        this.props.auteur 
-                                        ? this.handleInterest 
-                                        : () => this.props.history.push('/register')}
-                                    />
+                                        this.props.auteur
+                                            ? this.handleInterest
+                                            : () => this.props.history.push('/register')}
+                                />
+
+                                <Comment.Group>
+                                    <Header as='h3' dividing>
+                                        Les Commentaires
+                                    </Header>
+
+                                    {this.state.ann > 0 && this.state.ann.comments.map((com) => {
+                                    <Comment>
+                                        <Comment.Content>
+                                            <Comment.Author as='a'>{}</Comment.Author>
+                                            <Comment.Metadata>
+                                            <div>{}</div>
+                                            </Comment.Metadata>
+                                            <Comment.Text>{com.comment}</Comment.Text>
+                                        </Comment.Content>
+                                    </Comment>
+                                    })}
+                                    
+                                </Comment.Group>
+                                <Form reply>
+                                    <Form.TextArea 
+                                        name='comment' 
+                                        value={this.state.comment} 
+                                        onChange={
+                                            this.updateInput
+                                        } />
+                                    <Button content='+ Commentaire' size='large' primary onClick={this.handleComment} />
+                                </Form>
                             </Modal.Content>
                             
                         </Modal.Content>

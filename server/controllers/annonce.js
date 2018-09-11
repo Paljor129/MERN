@@ -6,8 +6,8 @@ const dotenv = require('dotenv')
 
 dotenv.config()
 
-const User = require("../models/User");
-const Annonce = require('../models/Annonce');
+const User = require("../models/user");
+const Annonce = require('../models/annonce');
 
 const googleMapsClient = require('@google/maps').createClient({ 
     key : process.env.GOOGLEMAPS_API_KEY
@@ -78,9 +78,7 @@ router.get('/:_id/match', (req, res) => {
                         .populate('annonce')
                 })
                 .then(users => {
-                    console.log('users match ', users)
                     res.json(users
-                        // .map( u => u)
                     )
                 })
                 .catch(err => {
@@ -121,6 +119,7 @@ router.put('/:id', (req, res) => {
     Annonce
         .findByIdAndUpdate(req.params.id, { $set : req.body}, { new: true })
         .then(annonce => {
+            console.log('annonce update ', annonce)
             res.json(annonce)
         })
         .catch(err => {
@@ -188,3 +187,23 @@ router.delete('/:id/:user_id', (req, res) => {
 })
 
 module.exports = router
+
+
+
+
+
+
+// router.get('/:annonce_id', (req, res) => {
+//     Annonce
+//         .find({})
+//         .then(ann => {
+//             return Annonce
+//                 .find({ id: { $ne: req.params.annonce_id } })
+//         })
+//         .then(annonces => {
+//             res.json(annonces)
+//         })
+//         .catch(err => {
+//             res.json(err)
+//         })
+// })

@@ -1,8 +1,6 @@
 import React from 'react'
-import { Button, Header, Modal } from 'semantic-ui-react';
+import { Button, Header, Modal, Form } from 'semantic-ui-react';
 import { Image } from 'cloudinary-react'
-import axios from 'axios'
-import '../styles/CardAnnonce.css'
 import moment from 'moment'
 
 class Cards extends React.Component {
@@ -16,8 +14,6 @@ class Cards extends React.Component {
     close = () => this.setState({ open: false })
 
     componentDidMount() {
-        //to verify if there is no user_id in an users array of Annonce collection
-        //-1 means if there is no user_id
         this.setState({ interested: this.props.annonce.users.indexOf(this.props.auteur) > -1 })
     }
 
@@ -53,8 +49,7 @@ class Cards extends React.Component {
 
                 <div className='content'>
                     <div className='header'>{this.props.annonce.titre}</div>
-                    <div className='description'>{this.props.annonce.auteur.address}</div>
-                    <div className='description'>{this.props.annonce.address}</div>
+                    <div className='description'>{this.props.annonce.period}</div>
                 </div>
                 <Modal className='scrolling' dimmer={dimmer} open={open} onClose={this.close}
                     trigger={<Button color='violet' onClick={this.show('blurring')}> Détail </Button>} closeIcon>
@@ -81,13 +76,17 @@ class Cards extends React.Component {
                                     content='Interessé'
                                     icon='exchange'
                                     labelPosition='right'
-                                    size='big'
+                                    size='large'
                                     disabled={this.state.interested}
                                     onClick={
                                         this.props.auteur
                                             ? this.handleInterest
                                             : () => this.props.history.push('/register')}
                                 />
+                                <Form reply>
+                                    <Form.TextArea />
+                                    <Button content='+ Commentaire' size='large' primary />
+                                </Form>
                             </Modal.Content>
 
                         </Modal.Content>

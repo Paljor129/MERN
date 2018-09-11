@@ -2,12 +2,11 @@ const express = require('express');
 const bcrypt = require('bcryptjs');
 const passport = require('passport');
 const router = express.Router();
-const auth = require('../helpers/auth');
 const dotenv = require('dotenv')
 
 dotenv.config()
 
-const User = require('../models/User');
+const User = require('../models/user');
 
 const googleMapsClient = require('@google/maps').createClient({
     key: process.env.GOOGLEMAPS_API_KEY
@@ -73,7 +72,6 @@ const passportMiddleware = passport.authenticate('local', {
 router.post('/login', passportMiddleware, (req, res) => {
     const { email, password } = req.body;
     res.json(req.user)
-    // if (info) return res.send(info)
 })
 
 router.put('/user/:id', (req, res) => {

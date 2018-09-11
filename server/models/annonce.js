@@ -13,7 +13,8 @@ const AnnonceSchema = new Schema({
     description: {type: String, required: true, trim: true},
     date: {type: Date, default: Date.now},
     auteur: {type: Schema.Types.ObjectId, ref: 'User', require: false},
-    users: [{type: Schema.Types.ObjectId, ref: 'User', require: false}]
+    users: [{type: Schema.Types.ObjectId, ref: 'User', require: false}],
+    comments: [{ type: Schema.Types.ObjectId, ref: 'Comment', require: false }]
 });
 AnnonceSchema.index({location: '2dsphere'})
 

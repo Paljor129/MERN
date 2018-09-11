@@ -39,7 +39,7 @@ class Header extends React.Component {
               }
               {this.props.userHasAnnonce && 
                 <LinkContainer to="/annonceMatched" >
-                  <NavItem>Annonces corréspondant</NavItem>
+                  <NavItem>Annonces correspondant</NavItem>
                 </LinkContainer>
               }
             </Nav>

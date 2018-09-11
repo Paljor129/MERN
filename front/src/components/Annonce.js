@@ -20,7 +20,6 @@ class Annonce extends React.Component {
                                     <Image
                                         cloudName="dkhupnzr8" 
                                         publicId={this.props.user.annonce.image} 
-                                        width={400} 
                                         crop="scale" 
                                     />
                                 </div>

@@ -32,24 +32,16 @@ mongoose.connect(mongoUrl)
     .then(() => console.log('Mongodb Connected'))
     .catch(err => console.log(err));
 
-
-//Returns middleware that only parses JSON and only looks at requests where the Content-Type header matches the type option
 app.use(express.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-// app.use((req, res, next) => {
-//     req.db = db;
-//     next();
-// })
-
-//Passport Config
 require('./server/config/passport')(passport);
 
 app.use('/auth', require('./server/controllers/auth'))
 app.use('/annonce', require('./server/controllers/annonce'))
+app.use('/comment', require('./server/controllers/comment'))
 
 
-//To connect with front
 app.use('/', express.static(path.join(__dirname, './front/build')))
 app.use('/*', (req, res) => {
     res.sendFile(path.join(__dirname, './front/build/index.html'))

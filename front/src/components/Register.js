@@ -3,9 +3,22 @@ import { Form, Message, Icon, Button } from 'semantic-ui-react'
 import { Link } from 'react-router-dom'
 import PlacesAutocomplete, {geocodeByAddress, getLatLng} from 'react-places-autocomplete';
 import classnames from '../helpers'
+import Popup from 'react-popup';
 
 const preset = 's24frout'
 const URL = 'https://api.cloudinary.com/v1_1/dkhupnzr8/image/upload'
+
+const options = [
+  {
+    key: 'm',
+    text: 'Monsieur',
+    value: 'male'
+  }, {
+    key: 'f',
+    text: 'Madame',
+    value: 'female'
+  }
+]
 
 class Register extends React.PureComponent {
   state = {
@@ -17,57 +30,14 @@ class Register extends React.PureComponent {
     address: "",
     image: "",
     file: null,
+    age: "",
     disableBtn: true,
-    errorMessage: '',
-    latitude: null,
-    longitude: null,
-    isGeocoding: false
+    errorMessage: "",
   };
 
-  handleChange = address => {
-    this.setState({ 
-      address,
-      latitude: null,
-      longitude: null,
-      errorMessage: '',
-    });
-  };
-
-  handleSelect = selected => {
-    this.setState({ isGeocoding: true, address: selected });
-    geocodeByAddress(selected)
-      .then(results => getLatLng(results[0]))
-      .then(({ lat, lng }) => {
-        this.setState({
-          latitude: lat,
-          longitude: lng,
-          isGeocoding: false,
-        });
-      })
-      .catch(error => {
-        this.setState({ isGeocoding: false });
-      });
-  };
-
-  handleCloseClick = () => {
-    this.setState({
-      address: '',
-      latitude: null,
-      longitude: null,
-    });
-  };
-
-  handleError = (status, clearSuggestions) => { 
-    this.setState({ errorMessage: status }, () => {
-      clearSuggestions();
-    });
-  };
-
-  //whenever we change input, it will recreate the state
   updateInput = async e => {
     const newState = {};
     newState[e.target.name] = e.target.value;
-    //setState is await (to wait for the reply)
     await this.setState(newState);
     this.canSendForm();
   };
@@ -83,8 +53,6 @@ class Register extends React.PureComponent {
       this.state.password,
       this.state.passwordCheck
     );
-    
-    //button will be enable only after all the input will be filled
     if (nonEmptyFields && passwords) {
       this.setState({ disableBtn: false });
     } else {
@@ -92,27 +60,57 @@ class Register extends React.PureComponent {
     }
     
   };
-  
   checkNonEmptyFields = () => {
-    const { firstname, lastname, email, password, passwordCheck, address, image } = this.state;
+    const { firstname, lastname, email, password, passwordCheck, age } = this.state;
     if (
       this.nonEmptyString(firstname) &&
       this.nonEmptyString(lastname) &&
       this.nonEmptyString(email) &&
       this.nonEmptyString(password) &&
       this.nonEmptyString(passwordCheck) &&
-      this.nonEmptyString(address) &&
-      this.nonEmptyString(image)
+      this.nonEmptyString(age)
     ) {
       return true;
     } else {
       return false;
     }
   };
-  
+
   checkPassword = (password, passwordCheck) => {
     if (password === passwordCheck) return true;
     else return false;
+  };
+  
+  handleChange = address => {
+    this.setState({
+      address,
+      errorMessage: '',
+    });
+  };
+
+  handleSelect = selected => {
+    this.setState({ isGeocoding: true, address: selected });
+    geocodeByAddress(selected)
+      .then(results => getLatLng(results[0]))
+      .then(({ lat, lng }) => {
+        this.setState({
+        });
+      })
+      .catch(error => {
+        this.setState({ isGeocoding: false });
+      });
+  };
+
+  handleCloseClick = () => {
+    this.setState({
+      address: ''
+    });
+  };
+
+  handleError = (status, clearSuggestions) => {
+    this.setState({ errorMessage: status }, () => {
+      clearSuggestions();
+    });
   };
   
   handleRegister = e => {
@@ -129,6 +127,7 @@ class Register extends React.PureComponent {
     .then(res => {
       this.props.connect(res)
       this.props.history.push('/createAnnonce')
+      Popup.alert('Vous venez de créer un compte')
     })
     .catch(error => {
       console.log(error);
@@ -143,7 +142,7 @@ class Register extends React.PureComponent {
         : this.setState({ error: 'Vous n\'avez  pas selectionné le fichier' })
     }
 
-    onChange = file => this.setState({ file })
+    onChange = file => { this.setState({ file }) }
 
     handleErrors = response => {
       if (!response.ok) {
@@ -178,7 +177,7 @@ class Register extends React.PureComponent {
               <Form.Input fluid
                 icon='user'
                 iconPosition='left'
-                name='firstname'
+                name='lastname'
                 label='Nom'
                 placeholder='Nom' 
                 type='text' 
@@ -186,12 +185,12 @@ class Register extends React.PureComponent {
                   this.updateInput
                 }
                 value={
-                  this.state.firstname
+                  this.state.lastname
                 }  />
               <Form.Input fluid
                 icon='user'
                 iconPosition='left' 
-                name='lastname'
+                name='firstname'
                 label='Prénom'
                 placeholder='Prénom' 
                 type='text' 
@@ -199,7 +198,7 @@ class Register extends React.PureComponent {
                   this.updateInput
                 }
                 value={
-                  this.state.lastname
+                  this.state.firstname
                 }  />
             </Form.Group>
             <Form.Input 
@@ -267,57 +266,66 @@ class Register extends React.PureComponent {
                 </Form.Input>
               </Form.Group>
 
-          <PlacesAutocomplete
-            value={this.state.address}
-            onChange={this.handleChange}
-            onSelect={this.handleSelect}
-            onError={this.handleError}
-            shouldFetchSuggestions={this.state.address.length > 2}
-          >
+            <PlacesAutocomplete
+              value={this.state.address}
+              onChange={this.handleChange}
+              onSelect={this.handleSelect}
+              onError={this.handleError}
+              shouldFetchSuggestions={this.state.address.length > 2}
+            >
 
-            {({ getInputProps, suggestions, getSuggestionItemProps }) => {
-              return (
-                <div className="search-bar-container">
-                  <div className="search-input-container">
-                    <label>Adresse</label>
-                    <input
-                      {...getInputProps({
-                        name: 'address',
-                        placeholder: 'Votre adresse de travail...',
-                        className: 'search-input',
-                      })}
-                    />
-                  </div>
-                  {suggestions.length > 0 && (
-                    <div className="autocomplete-container">
-                      {suggestions.map(suggestion => {
-                        const className = classnames('suggestion-item', {
-                          'suggestion-item--active': suggestion.active,
-                        });
-
-                        return (
-                          <div
-                            {...getSuggestionItemProps(suggestion, { className })}
-                          >
-                            <strong>
-                              {suggestion.formattedSuggestion.mainText}
-                            </strong>{' '}
-                            <small>
-                              {suggestion.formattedSuggestion.secondaryText}
-                            </small>
-                          </div>
-                        );
-                      })}
+              {({ getInputProps, suggestions, getSuggestionItemProps }) => {
+                return (
+                  <div className="search-bar-container">
+                    <div className="search-input-container">
+                      <label>Adresse</label>
+                      <input
+                        {...getInputProps({
+                          name: 'address',
+                          placeholder: 'Votre adresse de travail...',
+                          className: 'search-input',
+                        })}
+                      />
                     </div>
-                  )}
-                </div>
-              );
-            }}
-          </PlacesAutocomplete>
-          {this.state.errorMessage.length > 0 && (
-            <div className="error-message">{this.state.errorMessage}</div>
-          )}
+                    {suggestions.length > 0 && (
+                      <div className="autocomplete-container">
+                        {suggestions.map(suggestion => {
+                          const className = classnames('suggestion-item', {
+                            'suggestion-item--active': suggestion.active,
+                          });
 
+                          return (
+                            <div
+                              {...getSuggestionItemProps(suggestion, { className })}
+                            >
+                              <strong>
+                                {suggestion.formattedSuggestion.mainText}
+                              </strong>{' '}
+                              <small>
+                                {suggestion.formattedSuggestion.secondaryText}
+                              </small>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </div>
+                );
+              }}
+            </PlacesAutocomplete>
+            <Form.Group widths='equal'>
+              <Form.Select fluid label='Gender' options={options} placeholder='Gender' />
+              <Form.Input fluid 
+                label='Age' 
+                placeholder='Votre age' 
+                name='age'
+                onChange={
+                  this.updateInput
+                }
+                value={
+                  this.state.age
+                } />
+            </Form.Group>
             <Button
               size='big'
               color='green'

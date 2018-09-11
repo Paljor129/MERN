@@ -62,7 +62,6 @@ class CreateAnnonce extends React.Component {
     };
 
     handleError = (status, clearSuggestions) => {
-        console.log('Error from Google Maps API', status);
         this.setState({ errorMessage: status }, () => {
             clearSuggestions();
         });
@@ -84,12 +83,10 @@ class CreateAnnonce extends React.Component {
     };
 
     checkNonEmptyFields = () => {
-        const { address, period, titre, image, description } = this.state;
+        const { period, titre, description } = this.state;
         if (
-            this.nonEmptyString(address) &&
             this.nonEmptyString(period) &&
             this.nonEmptyString(titre) &&
-            this.nonEmptyString(image) &&
             this.nonEmptyString(description)
         ) {
             return true;
@@ -222,7 +219,7 @@ class CreateAnnonce extends React.Component {
                         iconPosition='left'
                         name='period'
                         label='Période recherchée (Uniquement pour information)'
-                        placeholder='Par exemple de janvier à mars 2019'
+                        placeholder='Par exemple De 1-jan-2019 à 20-mars-2019'
                         type='text'
                         onChange={
                             this.updateInput

@@ -1,7 +1,6 @@
 import React from 'react'
 import {BrowserRouter, Route, Switch} from 'react-router-dom'
 import axios from 'axios'
-import '../styles/Router.css'
 
 import Header from './Header'
 import Home from './Home'
@@ -35,7 +34,6 @@ class Router extends React.Component {
         this.setState({
             connected: JSON.parse(localStorage.connected)
         })
-        //to make a localStorage.auteur equal to real user id
         localStorage.auteurId = user._id
         this.setState({auteur: localStorage.auteurId})
         this.setState({user: user})

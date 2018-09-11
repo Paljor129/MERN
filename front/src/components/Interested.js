@@ -1,15 +1,18 @@
 import React from 'react'
 import { Image } from 'cloudinary-react'
 import axios from 'axios'
-import { List, Button, Icon, Message } from 'semantic-ui-react'
+import { List, Button, Icon, Message, Modal, Header } from 'semantic-ui-react'
 
 class Interested extends React.Component{
     state = {
+        open: false,
         annonce: null
     }
 
+    show = dimmer => () => this.setState({ dimmer, open: true })
+    close = () => this.setState({ open: false })
+
     componentDidMount() {
-        console.log('annonce interested ', this.props.user.annonce._id)
         this.dataRecharge()        
     }
 
@@ -30,7 +33,7 @@ class Interested extends React.Component{
             })
     }
 
-    handleDelete = userId => {        
+    handleDelete = userId => {
         axios
             .delete('/annonce/'+this.props.user.annonce._id+'/'+userId)
             .then(res => {
@@ -42,9 +45,10 @@ class Interested extends React.Component{
     }
 
     render() {
+        const { open, dimmer } = this.state
         return (
             <div>
-                    {this.state.annonce && this.state.annonce.users[0]
+                    {this.state.annonce > 0 && this.state.annonce.users[0]
                         ?<Message
                         attached
                         header='Liste des utilisateurs qui sont intéressés'
@@ -52,16 +56,37 @@ class Interested extends React.Component{
                         :<div></div>
                     }
                     
-                    {this.state.annonce && this.state.annonce.users.map((user) => (
+                    {this.state.annonce > 0 && this.state.annonce.users.map((user) => (
                         
-                        <List animated divided verticalAlign='middle'>
+                        <List divided verticalAlign='middle'>
                             <List.Item>
                                 <List.Content floated='right'>
-                                    <Button positive>                                        
-                                        <Icon name='envelope'></Icon>  
-                                        Contacter                                    
-                                    </Button>
-                                    {/* {JSON.stringify(user)} */}
+                                    <Modal size='medium' className='scrolling' dimmer={dimmer} open={open} onClose={this.close}
+                                        trigger={<Button color='violet' onClick={this.show('blurring')}> Annonce </Button>} closeIcon>
+                                        <Modal.Header>
+                                            Détail de l'annonce
+                                        </Modal.Header>
+                                        <div className='content'>
+                                        <Modal.Content image scrolling>
+                                            <Modal.Content>
+                                                <div className='ui large image'>
+                                                    <Image
+                                                    cloudName="dkhupnzr8"
+                                                    publicId={user.annonce.image}
+                                                    crop="scale" />
+                                                </div>
+                                            </Modal.Content>
+                                            <Modal.Content>
+                                                <Header>{user.annonce.titre}</Header>
+                                                <h4>Disponible : {user.annonce.period}</h4>
+                                                <h4>L'adresse d'utilisateur : {user.address}</h4>
+                                                <h4>Recherche une chambre à proximité : {user.annonce.address}</h4>
+                                                <p>{user.annonce.description}</p>                                
+                                            </Modal.Content>
+                                            
+                                        </Modal.Content>
+                                        </div>
+                                    </Modal>
                                     <Button negative
                                         onClick={() => this.handleDelete(user._id)}>
                                         <Icon name='trash'></Icon>
